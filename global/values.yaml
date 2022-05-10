@@ -29,7 +29,7 @@ global:
 #   Target Cluster:
 #     <git_cluster_prefix_url>/<cluster_git_prefix>-<cluster.name>.<global.domain>.git
 #
-  git_cluster_prefix_url: "https://github.com/nsatsia"
+  git_cluster_prefix_url: "https://github.com/openshift-telco"
 # 
 # cluster_git_prefix defines the prefix givenm to all git repos for target clusters
 #
