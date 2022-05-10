@@ -4,7 +4,7 @@ mgmt:
   name: manage
   #  
   # Git URL for this management cluster
-  git_url: https://github.com/nsatsia/mgmt-manage.lab.diktio.net.git
+  git_url: https://github.com/openshift-telco/mgmt-manage.lab.diktio.net.git
   #
   # OPTIONAL
   # Set to override the global credentials for the given management cluster and all its target clusters
