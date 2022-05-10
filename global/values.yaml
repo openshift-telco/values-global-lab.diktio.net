@@ -1,0 +1,246 @@
+#
+# This global values.yaml file contains Helm values that apply to an entire environment.
+#
+global:
+#
+# Domain for Telco/Enterprise environment assigned to OCP
+# Each cluster deployed will be a subdomain of this domain 
+#
+  domain: lab.diktio.net
+#
+# Credentials for accessing the private repositories for all OCP GitOps
+# Note that these credentials can be overwritten on a per management cluster/region basis
+# by setting them in the given management clusters values.yaml
+#
+  git_user: nsatsia
+  git_token: <GIT_TOKEN>
+#
+# Global values directory path used in ArgoCD applications. Typically could not change unless
+# you  decide to change the Git Submodule  directories
+#
+  values_location: /values/global/values.yaml
+#
+# Site wide DNS server.
+#
+  dns: 192.19.128.2
+#
+# git_cluster_prefix_url should be set to the git account/org whe the repo's will be kept
+# URL:
+#   Target Cluster:
+#     <git_cluster_prefix_url>/<cluster_git_prefix>-<cluster.name>.<global.domain>.git
+#
+  git_cluster_prefix_url: "https://github.com/nsatsia"
+# 
+# cluster_git_prefix defines the prefix givenm to all git repos for target clusters
+#
+  cluster_git_prefix: "cluster"
+#
+# Example for cluster ran2 and node cu20 :
+#   values_cluster_prefix_url: "https://github.com/sonofspike"
+#   cluster_git_prefix: "cluster"
+#
+#   Cluster URL: https://github.com/sonofspike/cluster-ran2.telco.lab.git
+#
+#
+# Container image mirror registry access information for OCP.
+#
+  registry:
+    url: "lab-registry.ocpmgmt.lab.diktio.net"
+    path: ocp4923
+    user: "nsatsia"
+    password: "Redhat01"
+#
+# Site mirror information required by Hive and Assisted-Installer
+#
+  mirror:
+    #
+    # Operator CatalogSource to use, i.e. select the mirror or Direct to Red Hat
+    # Red Hat Direct is "redhat-operators"
+    # Local mirror is "redhat-operator-index"
+    operator_source: redhat-operator-index
+    #
+    # OCP install version defined in the AgentClusterInstall CRD for each target cluster
+    # Must match anm entry in the list below defined in Hive ClusterImageSet CRDs
+    #
+    install_mirror_name: "openshift-v4.10.10"
+    #install_mirror_name: "openshift-v4.9.23-mirror"
+    #
+    # List of OCP version mirror URLs available to install. At least oen must be defined.
+    #
+    list:
+      - name: openshift-v4.10.10
+        path: quay.io/openshift-release-dev/ocp-release:4.10.10-x86_64
+      - name: openshift-v4.9.28
+        path: quay.io/openshift-release-dev/ocp-release:4.9.28-x86_64
+      - name: openshift-v4.9.23-mirror
+        path: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ocp4923:4.9.23-x86_64
+      - name: openshift-v4.8.29-mirror
+        path: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ocp4829:4.8.29-x86_64
+      - name: openshift-v4.8.22-mirror
+        path: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ocp4822:4.8.22-x86_64
+  # 
+  # Quay specific configurations. Not needed if another vendor image registry is used.
+  # 
+  quay:
+  #
+  # The secret the config will be saved in
+  #
+    config_secret: lab-quay-config-bundle
+    #
+    # config_yaml is set to the Quay configuration customising items like a user friendly server name.
+    # This config also configures an external S3 storage to be used for image storage.
+    #
+    # ssl_cert and ssl_key are required to configure a site wide self-signed TLS certificates for the server.
+    #
+    config_yaml: |-
+      ALLOW_PULLS_WITHOUT_STRICT_LOGGING: false
+      AUTHENTICATION_TYPE: Database
+      DEFAULT_TAG_EXPIRATION: 2w
+      ENTERPRISE_LOGO_URL: /static/img/RH_Logo_Quay_Black_UX-horizontal.svg
+      FEATURE_BUILD_SUPPORT: false
+      FEATURE_DIRECT_LOGIN: true
+      FEATURE_MAILING: false
+      REGISTRY_TITLE: Red Hat Quay
+      REGISTRY_TITLE_SHORT: Red Hat Quay
+      TAG_EXPIRATION_OPTIONS:
+      - 2w
+      TEAM_RESYNC_STALE_TIME: 60m
+      TESTING: false
+      SERVER_HOSTNAME: lab-registry.ocpmgmt.lab.diktio.net
+      DISTRIBUTED_STORAGE_CONFIG:
+        local_us:
+        - RadosGWStorage
+        - access_key: NJBPAVFV8Y31FVJ1KZRL
+          bucket_name: ocpmgmt-cluster-bucket
+          hostname: 192.19.130.13
+          is_secure: false
+          port: "80"
+          secret_key: y6jP327JGRDdqBSc7UYhsZLzhZUAuBK9BPK2Ox1j
+          storage_path: /datastorage/registry
+
+    ssl_cert: |-
+      -----BEGIN CERTIFICATE-----
+      MIIEfjCCA2agAwIBAgICEicwDQYJKoZIhvcNAQELBQAwOTEXMBUGA1UECgwOTEFC
+      LkRJS1RJTy5ORVQxHjAcBgNVBAMMFUNlcnRpZmljYXRlIEF1dGhvcml0eTAeFw0y
+      MTExMjAwMjI5MTJaFw0yMzExMjEwMjI5MTJaMEcxFzAVBgNVBAoMDkxBQi5ESUtU
+      SU8uTkVUMSwwKgYDVQQDDCNsYWItcmVnaXN0cnkub2NwbWdtdC5sYWIuZGlrdGlv
+      Lm5ldDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALbB3yDIlVaaq0ZO
+      eyl+hAkMfMWSmPLsH4FqmGGhV8XnHRlWD8sDzn0D+PavRU7Ep79gPHMwGyUiIBit
+      hIOhe37kf9m8uW9dGdU1TeOEbNqqEvC6VvCKc7X2Vs1NP0rd2xge8nC0y1X1SMZF
+      p+Jzu+pb78PMzBRTd+i0WEpCEAMlu42T2ozmXygD3Dwky52zPC97GLTaQfuYM2Gc
+      reKs9KwVzWKPAG3fTIrwZxVjcGAffAkaGHZ93dCBFi2tEbAfndFSdfuyCBGyuyT9
+      Yv/BOawou8gobv0/H9JDmI1oNibx/WFhne9fBI8Sg66wPr/tyKefJjApwGzCU1lV
+      fpMN1WcCAwEAAaOCAYAwggF8MB8GA1UdIwQYMBaAFArUwLl/BONQut9blni9jzZ+
+      cZw2MEAGCCsGAQUFBwEBBDQwMjAwBggrBgEFBQcwAYYkaHR0cDovL2lwYS1jYS5s
+      YWIuZGlrdGlvLm5ldC9jYS9vY3NwMA4GA1UdDwEB/wQEAwIE8DAdBgNVHSUEFjAU
+      BggrBgEFBQcDAQYIKwYBBQUHAwIweQYDVR0fBHIwcDBuoDagNIYyaHR0cDovL2lw
+      YS1jYS5sYWIuZGlrdGlvLm5ldC9pcGEvY3JsL01hc3RlckNSTC5iaW6iNKQyMDAx
+      DjAMBgNVBAoMBWlwYWNhMR4wHAYDVQQDDBVDZXJ0aWZpY2F0ZSBBdXRob3JpdHkw
+      HQYDVR0OBBYEFGVec3OeIt6Oh3smGCpacgJj4ZnxME4GA1UdEQRHMEWCI2xhYi1y
+      ZWdpc3RyeS5vY3BtZ210LmxhYi5kaWt0aW8ubmV0gh5pbmdyZXNzLm9jcG1nbXQu
+      bGFiLmRpa3Rpby5uZXQwDQYJKoZIhvcNAQELBQADggEBALg/oMfo6CnrRJq35SJx
+      u2Vv1gPQsST5v5C0ZV0rgG1HXCya5eTokI7tTEuHC45FhqRgaj9MGYVeJinMj6e4
+      GXUcRGVESRD4qp90gPTHWWYOtTxXvVqZscwP6UT6QbOrCI+r9inDHDVEYuBY9QDa
+      HzEEqM7VjNyqi4xrCotEjmFjEEPQzZ7gNpmN6no0uEuQ05ulQTNid9b0oDfek6Wq
+      9ages+3X5Q1W9V3V8SZWQilO3q5TIJOni83eum68LJS1QrLTWtSNWcHFF+6uyi6h
+      iGEVk1GnmQmMoUL5e1wrspc+ExkUCTQFV7RVDhvEEFUsa2gDsLi9Ivp1PgpNbmb5
+      sKo=
+      -----END CERTIFICATE-----
+
+    ssl_key: |-
+      -----BEGIN PRIVATE KEY-----
+      MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC2wd8gyJVWmqtG
+      TnspfoQJDHzFkpjy7B+BaphhoVfF5x0ZVg/LA859A/j2r0VOxKe/YDxzMBslIiAY
+      rYSDoXt+5H/ZvLlvXRnVNU3jhGzaqhLwulbwinO19lbNTT9K3dsYHvJwtMtV9UjG
+      Rafic7vqW+/DzMwUU3fotFhKQhADJbuNk9qM5l8oA9w8JMudszwvexi02kH7mDNh
+      nK3irPSsFc1ijwBt30yK8GcVY3BgH3wJGhh2fd3QgRYtrRGwH53RUnX7sggRsrsk
+      /WL/wTmsKLvIKG79Px/SQ5iNaDYm8f1hYZ3vXwSPEoOusD6/7cinnyYwKcBswlNZ
+      VX6TDdVnAgMBAAECggEBAIfHDbDblSfcjXcUg6hWWF4oquJWgc+o4ddSjJesOPvN
+      Mu9J4z3fPB/hPax4lzNoI4CpTP//M4upCNOMxrDM3mVt+haYgeRc9P5UNePc1Mq4
+      JI44wrK/CiycMe0hgO5sWYRYKaLWj2LzcvfrdEln1qrNVxrPIqfPQ3zdz+KLpj3P
+      Hw17kti8mxdnAQwdQqVMIQaV8VbzGRsDGO1VbF5dLTzLfNusgWJI41etYpMIgvB3
+      pPVpXNcd0Vff6xxEQ+WeF/KM3NbvdXBOsYLGINZrNjqpOmLRdvHukJdCt04uhzkp
+      Y7voV4X3W+F+zjA7JIc69+oX+YhBv6f2X1zIKWloGVECgYEA4fRfZdgiBWxo7k39
+      WqUydzA3K+aaiIOwZrajarRFm5QpGRnmWVFYLp6xkAaUuUj3nfKpgR2WbLVKJ8aj
+      ZONzOJnusyl3IMW+2OX8jLUNZcA1ST2LZnVVHo2hqopxpLPxM3yPTETLimaH2J96
+      tjtFQDeZKRqvtqI0Knp8tJPNp4UCgYEAzw8J0wSf55j0wtJD7H5Ru2HX1iaLmqWY
+      ImNUZuHtQ9zgUZxYNB7G1RGE5J7inwacnRtWndfleRbVX6yvbhid0Ao+C4wp6JH+
+      6l3rtqXUXrILgFvMle+kQLrncdxcklruC5kxkksBq4N/SBT/BFNoBlruC/j+deGz
+      JW+2ALN1HvsCgYAFDs5P3k2sp2eV5gME02vUxSyG/At7gM8jDXWM/uoL+H4PBMhm
+      OW7q5Dx/R9Zua1a3n2Xx8PKcDlbRmx2vNXQv0SpJsmTrQ+HowwUrNSZOn8XRlOIY
+      8glsvKjgw2aV1D1S9LfUcjnIKFFkJPW/PIZpUJVKGUHTqb/XL5S5ChHxbQKBgQC/
+      tdXLykFfhpBAfbwkEEUOcKYNgnzJf77fQAaah15N8gjDpzVHdKN2DZV0s+NxiAaj
+      s/c7h/TQa6K9xb5b+nDLeWA/AtSen+ZdCv6+isWZs9HQU66VuF7lC+hU1MnlPEmg
+      9YMfR1FRgxvrGn2PfMYY9EHpVe4MKR/cbpUeCwpK1wKBgF2XYd0HsITkpn/+vyHJ
+      m7d/k8WQwdvMcQelChN50KhEsVIKDVF4f4EcgEP3Rg0Oc8YPCLPQa1k0We+C0WNd
+      zEVpqv4BpapurzNOS+U7jrF1TrRcS+hyZHZUsbylxUYJlDUJNBrtDj/jkwQYFIWg
+      d0q9DWSlkDwAg7cmbGyE2RIO
+      -----END PRIVATE KEY-----
+#
+# Assisted Installer (standalone, infrastructure operator) site wide configurations
+#
+  ai:
+    #
+    # SSH public key for accessing deployed nodes
+    #
+      ssh_key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDClbZ802BHAXLgpNTv7a8KL/vUUxP6i1CFiGhIldD4RICeN3dTcm7fa/Q8vpVU9eMK0BiXhTLtj+8+iz7XDWEtO+ifA+MGSlaQG6gSX1LoOONDy2aM5pad1jq5jh1abkEcSuEDoxxuzl/Fa7mlLTQT06mtM8Z7ftypJWWX19W63pofEiXzdoE1dHcTO9kYa+od4EMrNdH0eIyNZaw9kA35AhEYSPLIiw9m/+6bzkAzeJNOQ0qPg1n/o2jXG7dHPjjH0HEqhzfRvF/RwEBKpxc46ZToS60OFs27eHQinaV59g66kzlzlJy0fW5875nGOzaRCHBnA0FL/JvZXHTLJwUEyNxQCvHq1oPQOk/xNgO0YJlhFbv6la68PnRvc2cnDZrz57RVOKYXRmA7EaMs59z3rh6+q1C8JF1kL5duHPZ+AUsFf1wGNERcj6fONKv09WI+GBYduI/HCr/jLpLwbcZqZwhmZZRq65L4sqGPB2eQlisV7iR+ZQb7klxjT4ljJ9c= nsatsia@fedora.localhost'
+    # 
+    # Site CA authority certificate
+    #
+      ca: |-
+        -----BEGIN CERTIFICATE-----
+        MIIDlDCCAnygAwIBAgIBATANBgkqhkiG9w0BAQsFADA5MRcwFQYDVQQKDA5MQUIu
+        RElLVElPLk5FVDEeMBwGA1UEAwwVQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTE5
+        MDMxMDAzNDM0MloXDTM5MDMxMDAzNDM0MlowOTEXMBUGA1UECgwOTEFCLkRJS1RJ
+        Ty5ORVQxHjAcBgNVBAMMFUNlcnRpZmljYXRlIEF1dGhvcml0eTCCASIwDQYJKoZI
+        hvcNAQEBBQADggEPADCCAQoCggEBAOEatwt8carWOdYsAoh8BSMg5tUZmU+rUe1L
+        fZKN6tA9ytpg4PqWaTRA8eXPfkyzpunf8NXmP1AWSf8LBH5fWUVxzFgmOfyrZroN
+        9sLjf+ueuh+LK7tixL56aUkx0fjQecoBpD5rq4JUemjC1QocpHAVZeYkDlvuoXEq
+        uhwj1/Dla5JI5YlEeD2AzvNNxjM3s23L+wfvPErKzbbamxFKZQPxCyPCom0Vm7hO
+        47WJ6RgVKMlCQGx2zcw8ckS3mj9DJwhHTAcNAdBJyK6AD4PDmk/L7pVYyS6HtCTj
+        NKAeedKqLFFGNvTkGCTBMA0aDwn5D1Ti9nqTG9tDm6a8PBmJWk0CAwEAAaOBpjCB
+        ozAfBgNVHSMEGDAWgBQK1MC5fwTjULrfW5Z4vY82fnGcNjAPBgNVHRMBAf8EBTAD
+        AQH/MA4GA1UdDwEB/wQEAwIBxjAdBgNVHQ4EFgQUCtTAuX8E41C631uWeL2PNn5x
+        nDYwQAYIKwYBBQUHAQEENDAyMDAGCCsGAQUFBzABhiRodHRwOi8vaXBhLWNhLmxh
+        Yi5kaWt0aW8ubmV0L2NhL29jc3AwDQYJKoZIhvcNAQELBQADggEBAIJ4Hd2BjDK1
+        tbeOp0TCmh3V59gaB4RTUQ8eDHKinqzglfWfvg6KsWMAENVRkjBqtEu7YwzMU5jx
+        imV/nV7B6euftOLlg3L6uHJyUyqdsb9e8rN2Lt2Zho4e6i726g9FRCVXMNaQVFA4
+        6rVNmIrAc88NGffiYxa1ANEfkqbD0RZYggxVBeN5l4C5QVZO/XdQLeUvQaFZir+R
+        5ieeL2Zp5BObGec6tWYaAjJwlE5YMQh6IvQQgUfVMGCFrPwdN3KP2jEXW91Dy3rn
+        WFBk6T3neXntdKX5ZipQM6qfFbH8DoDdElCvqZkB2bc1AwWaFzYbiEjz0oeowpUw
+        tEChGIzF/34=
+        -----END CERTIFICATE-----
+        -----BEGIN CERTIFICATE-----                                                      
+        MIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF                 
+        ADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6                 
+        b24gUm9vdCBDQSAxMB4XDTE1MDUyNjAwMDAwMFoXDTM4MDExNzAwMDAwMFowOTEL                 
+        MAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEZMBcGA1UEAxMQQW1hem9uIFJv                 
+        b3QgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALJ4gHHKeNXj                 
+        ca9HgFB0fW7Y14h29Jlo91ghYPl0hAEvrAIthtOgQ3pOsqTQNroBvo3bSMgHFzZM                 
+        9O6II8c+6zf1tRn4SWiw3te5djgdYZ6k/oI2peVKVuRF4fn9tBb6dNqcmzU5L/qw                 
+        IFAGbHrQgLKm+a/sRxmPUDgH3KKHOVj4utWp+UhnMJbulHheb4mjUcAwhmahRWa6                 
+        VOujw5H5SNz/0egwLX0tdHA114gk957EWW67c4cX8jJGKLhD+rcdqsq08p8kDi1L                 
+        93FcXmn/6pUCyziKrlA4b9v7LWIbxcceVOF34GfID5yHI9Y/QCB/IIDEgEw+OyQm                 
+        jgSubJrIqg0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMC                 
+        AYYwHQYDVR0OBBYEFIQYzIU07LwMlJQuCFmcx7IQTgoIMA0GCSqGSIb3DQEBCwUA                 
+        A4IBAQCY8jdaQZChGsV2USggNiMOruYou6r4lK5IpDB/G/wkjUu0yKGX9rbxenDI                 
+        U5PMCCjjmCXPI6T53iHTfIUJrU6adTrCC2qJeHZERxhlbI1Bjjt/msv0tadQ1wUs                 
+        N+gDS63pYaACbvXy8MWy7Vu33PqUXHeeE6V/Uq2V8viTO96LXFvKWlJbYK8U90vv                 
+        o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU                 
+        5MsI+yMRQ+hDKXJioaldXgjUkK642M4UwtBV8ob2xJNDd2ZhwLnoQdeXeGADbkpy                 
+        rqXRfboQnoZsG4q5WTP468SQvvG5                                                     
+        -----END CERTIFICATE-----             
+    #
+    # Pull_Secret name to be created merging the registry the local_registry information and credentials
+    #
+      pull_secret_name: multiclusterhub-operator-pull-secret
+#
+# Site wide Openshift GitOps configuration options
+#
+  gitops:
+    namespace: telco-gitops
+    common_label: "telco-gitops/automation: combined-ran"
+    service_account: cli-job-sa
+    service_account_name: cli-job-sa
+    hook_image: registry.redhat.io/openshift4/ose-tools-rhel8@sha256:1a0d6de276c9d467ba3a7ffd2547776067cad7fd3a78196c4ea068d6ad47fde3
+    #hook_image: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ose-tools-rhel8@sha256:c2230682e3f3a492967e7b62171cf363cff24fcb8252b2a0ca50e26dbbeb1b24

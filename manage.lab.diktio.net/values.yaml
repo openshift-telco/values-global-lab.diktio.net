@@ -1,0 +1,175 @@
+mgmt:
+  #
+  # name of management cluster. FQDN will be the <name.<global.domain>
+  name: manage
+  #  
+  # Git URL for this management cluster
+  git_url: https://github.com/nsatsia/mgmt-manage.lab.diktio.net.git
+  #
+  # OPTIONAL
+  # Set to override the global credentials for the given management cluster and all its target clusters
+  #
+  #git_user: ""
+  #git_token: ""
+  #
+  # This management clusters values directory path used in ArgoCD applications. Typically would not change unless
+  # you  decide to change the Git Submodule  directories
+  values_location: /values/manage.lab.diktio.net/values.yaml
+  #  
+  # Defines if ODF/OCS will be using internal rook/ceph  or external
+  # Uncomment the desired setting
+  default_storage_class: "odf-lvm-vg1"
+  #default_storage_class: "ocs-external-storagecluster-ceph-rbd"
+  #default_storage_class: "ocs-storagecluster-ceph-rbd"
+  #
+  # For multinode Management set to 3 and SNO set to 1
+  #ingress_replica: 3
+  ingress_replica: 1
+  #
+  # Define the master nodes and storage requirements
+  # Assumed this day0 cluster is deployed by IPI baremetal or Assisted-Installer as the BMH operator is required
+  nodes:
+    masters:
+    - name: "master1.manage.lab.diktio.net"
+      lso: "false"
+      ocs: "false"
+  # 
+  # Quay specific configurations. Not needed if another vendor image registry is used.
+  # 
+  quay:
+  #
+  # The secret the config will be saved in
+  #
+    config_secret: lab-quay-config-bundle
+    #
+    # config_yaml is set to the Quay configuration customising items like a user friendly server name.
+    # This config also configures an external S3 storage to be used for image storage.
+    #
+    # ssl_cert and ssl_key are required to configure a site wide self-signed TLS certificates for the server.
+    #
+    config_yaml: |-
+      ALLOW_PULLS_WITHOUT_STRICT_LOGGING: false
+      AUTHENTICATION_TYPE: Database
+      DEFAULT_TAG_EXPIRATION: 2w
+      ENTERPRISE_LOGO_URL: /static/img/RH_Logo_Quay_Black_UX-horizontal.svg
+      FEATURE_BUILD_SUPPORT: false
+      FEATURE_DIRECT_LOGIN: true
+      FEATURE_MAILING: false
+      REGISTRY_TITLE: Red Hat Quay
+      REGISTRY_TITLE_SHORT: Red Hat Quay
+      TAG_EXPIRATION_OPTIONS:
+      - 2w
+      TEAM_RESYNC_STALE_TIME: 60m
+      TESTING: false
+      SERVER_HOSTNAME: lab-registry.manage.lab.diktio.net
+      DISTRIBUTED_STORAGE_CONFIG:
+        default:
+          - RHOCSStorage
+          - access_key: Wm6YyEItmsGFdWhSdOSl
+            bucket_name: local-registry-bucket
+            hostname: s3.openshift-storage.svc
+            is_secure: true
+            port: "443"
+            secret_key: mZkCGK9AQSDWfoP8+O3aa19wx1uWoZWsyEHy5dxd
+            storage_path: /datastorage/registry
+      DISTRIBUTED_STORAGE_DEFAULT_LOCATIONS: []
+      DISTRIBUTED_STORAGE_PREFERENCE:
+        - default
+    #  DISTRIBUTED_STORAGE_CONFIG:
+    #    local_us:
+    #    - RadosGWStorage
+    #    - access_key: TAT68AR304KR09A004TG
+    #      bucket_name: manage-cluster-bucket
+    #      hostname: 192.19.130.13
+    #      is_secure: false
+    #      port: "80"
+    #      secret_key: YQpp4GXT3o8t9XBnDejQvYEAW2h8bXMnf6HCY5zp
+    #      storage_path: /datastorage/registry
+
+    ssl_cert: |-
+      -----BEGIN CERTIFICATE-----
+      MIIEezCCA2OgAwIBAgICEi4wDQYJKoZIhvcNAQELBQAwOTEXMBUGA1UECgwOTEFC
+      LkRJS1RJTy5ORVQxHjAcBgNVBAMMFUNlcnRpZmljYXRlIEF1dGhvcml0eTAeFw0y
+      MjA0MjMwNDQzMzRaFw0yNDA0MjMwNDQzMzRaMEYxFzAVBgNVBAoMDkxBQi5ESUtU
+      SU8uTkVUMSswKQYDVQQDDCJsYWItcmVnaXN0cnkubWFuYWdlLmxhYi5kaWt0aW8u
+      bmV0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx2UFzxP1/t0oePmM
+      Y7GRbURs7YefeWTRVSlsCeMj1QNvA2bGAer6hZLvl0W+ONCak3D/Tk0oAZgHOVw6
+      wm9AENZmB/UB6hS7j5iQGvxuJd+kq4AvO8iSHk+CPo8rRsyMfz3aUqCXcglLzJzB
+      UpzW3HugNjFx/NsYGZhtaj8OfbgHJBvMXqm9c4THczZh9XWE7ui/fiYTkp8276Nc
+      tcNxMoZfTuMz6OiQkyU8zHNtRL0PoWjbWMQsutLtlPdYtlW5uuBgFhgQU7dbFjXj
+      u5SVhPeF1R+y/Xstftu2tpJii7JKlly01CDCd5C3lxZIo12OqYBENoC0rx5dQr95
+      zPlg5wIDAQABo4IBfjCCAXowHwYDVR0jBBgwFoAUCtTAuX8E41C631uWeL2PNn5x
+      nDYwQAYIKwYBBQUHAQEENDAyMDAGCCsGAQUFBzABhiRodHRwOi8vaXBhLWNhLmxh
+      Yi5kaWt0aW8ubmV0L2NhL29jc3AwDgYDVR0PAQH/BAQDAgTwMB0GA1UdJQQWMBQG
+      CCsGAQUFBwMBBggrBgEFBQcDAjB5BgNVHR8EcjBwMG6gNqA0hjJodHRwOi8vaXBh
+      LWNhLmxhYi5kaWt0aW8ubmV0L2lwYS9jcmwvTWFzdGVyQ1JMLmJpbqI0pDIwMDEO
+      MAwGA1UECgwFaXBhY2ExHjAcBgNVBAMMFUNlcnRpZmljYXRlIEF1dGhvcml0eTAd
+      BgNVHQ4EFgQUk4Kod8XBZO69C/yN2UBs9uoMjJUwTAYDVR0RBEUwQ4IibGFiLXJl
+      Z2lzdHJ5Lm1hbmFnZS5sYWIuZGlrdGlvLm5ldIIdbWFzdGVyMS5tYW5hZ2UubGFi
+      LmRpa3Rpby5uZXQwDQYJKoZIhvcNAQELBQADggEBABY/mRCimx0mNr/S9ltU40mb
+      a19T07JcdenZ3eV3YE84nzw/GVdZvg5ygjj3RH2bbSGeH0onc8dpaDB0F7mJ2ngP
+      xWCCQEkioY3GpoKUkcnGl2c8qRvOo9QvgLx3AYwSSUYRhgoWF9MclPbaaoE4mmJm
+      qZEmHjSkTYnSmZp9gVRoAomVnqbl3lnse7Y7UYCSyugo34tRqEk1ziatLAHmS35U
+      XXrZLfO7C4OW+LCFrrPfueHJldZopS8cZ0To5yOi7OTnBvy0Pm4EZP9PVAS1pv0M
+      s4tp6Pg+s3ZJiFgCK/Wmv65onxx//cH79SiwYmQBsKoF6F3LaAr+UQD6ITzB/1g=
+      -----END CERTIFICATE-----
+
+    ssl_key: |-
+      -----BEGIN PRIVATE KEY-----
+      MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDHZQXPE/X+3Sh4
+      +YxjsZFtRGzth595ZNFVKWwJ4yPVA28DZsYB6vqFku+XRb440JqTcP9OTSgBmAc5
+      XDrCb0AQ1mYH9QHqFLuPmJAa/G4l36SrgC87yJIeT4I+jytGzIx/PdpSoJdyCUvM
+      nMFSnNbce6A2MXH82xgZmG1qPw59uAckG8xeqb1zhMdzNmH1dYTu6L9+JhOSnzbv
+      o1y1w3Eyhl9O4zPo6JCTJTzMc21EvQ+haNtYxCy60u2U91i2Vbm64GAWGBBTt1sW
+      NeO7lJWE94XVH7L9ey1+27a2kmKLskqWXLTUIMJ3kLeXFkijXY6pgEQ2gLSvHl1C
+      v3nM+WDnAgMBAAECggEBAKF90YmY+hi0WC46txibXVRpIevzdxbjr6NQzB7p50CD
+      6mqP13kALmz2x7P2GY18bmVSFIT/epJn5hnv9+s4HWRFsRdquWUz64DuqHAi2Lc1
+      /fGk/RxnYujHro4qeHt7+aKonuVjCaWjn8+VegIF4wNp4SVjQJXxgQBh8uQlNABf
+      GAiWKjwxHrRSGPE0cH9mlT2WWmfVmOUm/0HK7PQyt6LQ+P8uHvuhzP1iWNbHw54B
+      PZIrl9+XXO4NEo9Sr0VokU25DdVl5q7M4uNJyAJ+XU2RP95FR/I4UstSjSDG0ejn
+      QPpC66v1cmIb1a5+j8hDjR3JrJYB9AdmIEY1nfkud7ECgYEA8q7zfbHRdy37S8iu
+      T5+w1q8b7Zs3CAZDcCJ58vi82X5AMwib1cIikfkvXtTjyalXXCekgSlsrXhvUaDx
+      RWUcSm28HJigsyjfP5i6O4Uyg5CPvpbYeUavIXUL06cxuZp2IFsi4XVGyNNvcUW3
+      gVu4jhMDAowHh3dktMTj12fJIP8CgYEA0lX7Ch1QwiN7mKzOX4NxE2CGrdQs5YUn
+      SS/5eUDdMVkReRIGnQe0Zu1ENzJdcbgSGK8vjYoSJ4H3QytmddJgG2JyrFv2UIXc
+      b2PmC9NJtcwSosJ05fDiS6LYG6WQ5+mpgMDkF6QCBNUnm7jRTJpWjK9JC7UthJ+K
+      H8+fbsuC2BkCgYEAuI60PfLtCWW+pnOHnKYlJh8lbh2MTF33C2AsvcrMU9rfl/AE
+      ExwAjmKi08uzL7nI5hx/znpiW8orXji3Q78RNMkfNeAc1iNPJF5RwtIZCFT3/Elb
+      d1958EfDJsMP3cbJ7vFgJXW6zx98sPgEBixqviFXOKilUTBLNe5GF5qmKqECgYBs
+      ZsOqwtEMPR1F4km6EBQG2IiQrfk1kRpeLct1ImjdNfo7W37tDzt6kG3HxL1EDonF
+      DwSC/dW9Zs34YDW+I15Evsg67GpVtaeWAPZewdYLS9GO8IkuuKboNFUMapfz7gjd
+      wovLY0tnEjQHnYjA4goZF32d+xIqd87H9klE4L3egQKBgQC3JmYE5zkp0JrHTrtp
+      Yekd8KTZc9u5G2jf0q3jci2Wl24dWWIhAKh3DZKiTDetFwmwqbRwZvIbxkrQkGhk
+      Wk7CEBmeOL6P++8UoA+hAUVlxzyypzK5ONZC/nz0mGb6EVkKg1uOdFBM/gQ/lAt8
+      0+KcfdCB9Io9uVD/fAF81XhK+w==
+      -----END PRIVATE KEY-----
+  #
+  # Define the standalone Assisted-Installer  attributes on this management cluster
+  # Assumed it was installed by the Infrastructure Operator
+  ai: 
+    namespace: assisted-installer
+    service_config_name: "assisted-service-config"
+    #
+    # Digest for AI controller image as detected at the time of mirroring
+    # skopeo inspect docker://quay.io/edge-infrastructure/assisted-installer-controller:latest | egrep Digest | awk -F '"' '{print $4}'
+    controller_image: "quay.io/edge-infrastructure/assisted-installer-controller@sha256:7de8be81d61ec1eece42cec358e9f18e25e4020be35451e6340866f487553575"
+    
+    #
+    os_images:
+      osp_version: '4.10'
+      rhcos_version: 410.84.202202251620-0 
+      root_fs_img_url: http://192.19.130.11:8989/openshift-v4/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-live-rootfs.x86_64.img
+      root_fs_iso_url: http://192.19.130.11:8989/openshift-v4/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-live.x86_64.iso
+  #
+  ## to get rhcos_version boot root_fs_iso_url image and you'll see it on 1st line of console
+  ## https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.9/latest/
+  ## wget https://releases-art-rhcos.svc.ci.openshift.org/art/storage/releases/rhcos-4.8/48.84.202106301921-0/x86_64/rhcos-48.84.202106301921-0-openstack.x86_64.qcow2.gz?sha256=5a75df7b4d4dc1861093e520187a133eda3439019f280dc6e2f57edf70eb089d
+  bmh: 
+    prov_os_download_url: http://192.19.130.11:8989/rhcos-4.10.3-x86_64-openstack.x86_64.qcow2.gz?sha256=f581896eee37216021bfce9ddd5e1fd8289c366ca0d1db25221c77688de85fd7
+    #prov_os_download_url: http://192.19.130.11:8989/rhcos-48.84.202106301921-0-openstack.x86_64.qcow2.gz?sha256=5a75df7b4d4dc1861093e520187a133eda3439019f280dc6e2f57edf70eb089d
+    #prov_os_download_url: http://192.19.130.11:8989/rhcos-48.84.202106301921-0-openstack.x86_64.qcow2.gz?sha256=5a75df7b4d4dc1861093e520187a133eda3439019f280dc6e2f57edf70eb089d
+  #
+  # Some tuning for LSO volume set on this management cluster
+  lso:
+    maxdevice: 10
+    minsize: 1Gi
