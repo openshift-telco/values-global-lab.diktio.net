@@ -155,19 +155,25 @@ mgmt:
     controller_image: "quay.io/edge-infrastructure/assisted-installer-controller@sha256:7de8be81d61ec1eece42cec358e9f18e25e4020be35451e6340866f487553575"
     
     #
-    os_images:
-      osp_version: '4.10'
-      rhcos_version: 410.84.202202251620-0 
-      root_fs_img_url: http://192.19.130.11:8989/openshift-v4/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-live-rootfs.x86_64.img
-      root_fs_iso_url: http://192.19.130.11:8989/openshift-v4/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-live.x86_64.iso
+  os_images:
+      ocp_version: '4.10'
   #
-  ## to get rhcos_version boot root_fs_iso_url image and you'll see it on 1st line of console
-  ## https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.9/latest/
-  ## wget https://releases-art-rhcos.svc.ci.openshift.org/art/storage/releases/rhcos-4.8/48.84.202106301921-0/x86_64/rhcos-48.84.202106301921-0-openstack.x86_64.qcow2.gz?sha256=5a75df7b4d4dc1861093e520187a133eda3439019f280dc6e2f57edf70eb089d
+  ## Haven't found and easier way to get the image RHCOS version (rhcos_version) other than booting a VM with the ISO
+  ## and taking it from the 1st line of console
+      rhcos_version: 410.84.202202251620-0 
+  ## https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.10/latest/
+  ## wget https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-live.x86_64.iso
+  ## wget https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-live-rootfs.x86_64.img
+  ## Here I am using a local HTTP server to serve the images. Alternative us the Internet links.
+      root_fs_img_url: http://192.19.130.11:8989/openshift-v4/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-live-rootfs.x86_64.img
+      #root_fs_img_url: https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-live-rootfs.x86_64.img
+      root_fs_iso_url: http://192.19.130.11:8989/openshift-v4/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-live.x86_64.iso
+      #root_fs_iso_url: https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-live.x86_64.iso
   bmh: 
+  ## wget https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-openstack.x86_64.qcow2.gz
+  ## SHA from https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.10/latest/sha256sum.txt
     prov_os_download_url: http://192.19.130.11:8989/rhcos-4.10.3-x86_64-openstack.x86_64.qcow2.gz?sha256=f581896eee37216021bfce9ddd5e1fd8289c366ca0d1db25221c77688de85fd7
-    #prov_os_download_url: http://192.19.130.11:8989/rhcos-48.84.202106301921-0-openstack.x86_64.qcow2.gz?sha256=5a75df7b4d4dc1861093e520187a133eda3439019f280dc6e2f57edf70eb089d
-    #prov_os_download_url: http://192.19.130.11:8989/rhcos-48.84.202106301921-0-openstack.x86_64.qcow2.gz?sha256=5a75df7b4d4dc1861093e520187a133eda3439019f280dc6e2f57edf70eb089d
+    #prov_os_download_url: https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-openstack.x86_64.qcow2.gz?sha256=f581896eee37216021bfce9ddd5e1fd8289c366ca0d1db25221c77688de85fd7
   #
   # Some tuning for LSO volume set on this management cluster
   lso:
