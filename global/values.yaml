@@ -24,6 +24,10 @@ global:
 #
   dns: 192.19.128.2
 #
+# Site wide NTP server.
+#
+  ntp: ntp.iinet.net
+#
 # git_cluster_prefix_url should be set to the git account/org whe the repo's will be kept
 # URL:
 #   Target Cluster:
@@ -46,7 +50,7 @@ global:
 #
   registry:
     url: "lab-registry.ocpmgmt.lab.diktio.net"
-    path: ocp4923
+    path: ocp41013
     user: "nsatsia"
     password: "Redhat01"
 #
@@ -62,22 +66,33 @@ global:
     # OCP install version defined in the AgentClusterInstall CRD for each target cluster
     # Must match anm entry in the list below defined in Hive ClusterImageSet CRDs
     #
-    install_mirror_name: "openshift-v4.10.10"
-    #install_mirror_name: "openshift-v4.9.23-mirror"
+    install_mirror_name: "openshift-v4.10.13"
+    #install_mirror_name: "v4.10.13-mirror"
     #
     # List of OCP version mirror URLs available to install. At least oen must be defined.
     #
     list:
-      - name: openshift-v4.10.10
-        path: quay.io/openshift-release-dev/ocp-release:4.10.10-x86_64
+      - name: openshift-v4.10.13
+        path: quay.io/openshift-release-dev/ocp-release:4.10.13-x86_64
+      - name: openshift-v4.10.13-mirror
+        path: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ocp41013:4.10.13-x86_64
       - name: openshift-v4.9.28
         path: quay.io/openshift-release-dev/ocp-release:4.9.28-x86_64
-      - name: openshift-v4.9.23-mirror
-        path: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ocp4923:4.9.23-x86_64
       - name: openshift-v4.8.29-mirror
         path: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ocp4829:4.8.29-x86_64
-      - name: openshift-v4.8.22-mirror
-        path: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ocp4822:4.8.22-x86_64
+  # 
+  # ACM Related
+  acm:
+    thanos_yaml: |-
+      type: s3
+      config:
+        bucket: "ocp-ocpmgmt-thanos-bucket"
+        endpoint: "192.19.130.11:80"
+        insecure: true
+        access_key: "NJBPAVFV8Y31FVJ1KZRL"
+        secret_key: "udDUUjmFHa4ag03MPWdgmncwYmqYf6b1qMWIGbhJ"
+        http_config:
+          insecure_skip_verify: true
   # 
   # Quay specific configurations. Not needed if another vendor image registry is used.
   # 
@@ -231,7 +246,8 @@ global:
         rqXRfboQnoZsG4q5WTP468SQvvG5                                                     
         -----END CERTIFICATE-----             
     #
-    # Pull_Secret name to be created merging the registry the local_registry information and credentials
+    # Pull_Secret OCP secret name  and local registry pull_secret for target clusters.
+    # Global pull secret to merge with the local_registry is dynamically taken from Hub Cluster
     #
       pull_secret_name: multiclusterhub-operator-pull-secret
 #
@@ -242,5 +258,5 @@ global:
     common_label: "telco-gitops/automation: combined-ran"
     service_account: cli-job-sa
     service_account_name: cli-job-sa
-    hook_image: registry.redhat.io/openshift4/ose-tools-rhel8@sha256:1a0d6de276c9d467ba3a7ffd2547776067cad7fd3a78196c4ea068d6ad47fde3
+    hook_image: registry.redhat.io/openshift4/ose-tools-rhel8@sha256:3a430c4571983d4e774a7c2a6575086ad758d6a76724cc264ba80766abf5ee6b
     #hook_image: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ose-tools-rhel8@sha256:c2230682e3f3a492967e7b62171cf363cff24fcb8252b2a0ca50e26dbbeb1b24
