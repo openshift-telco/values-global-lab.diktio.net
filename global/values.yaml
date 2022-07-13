@@ -50,14 +50,14 @@ global:
 #
   registry:
     url: "lab-registry.ocpmgmt.lab.diktio.net"
-    path: ocp41013
+    path: ocp41020
     user: "nsatsia"
     password: "Redhat01"
 #
 # Site mirror information required by Hive and Assisted-Installer
 #
   mirror:
-    #
+    # NOT USED at the moment. DO NOT CHANGE
     # Operator CatalogSource to use, i.e. select the mirror or Direct to Red Hat
     # Red Hat Direct is "redhat-operators"
     # Local mirror is "redhat-operator-index"
@@ -91,15 +91,16 @@ global:
         path: lab-registry.snoacm.lab.diktio.net/nsatsia/openshift-release-dev/ocp-release:4.10.20-x86_64
   # 
   # ACM Related
+#### nsatsia: Need to allow naming of bucket. Fixed at "local-observe-bucket" ATM
   acm:
     thanos_yaml: |-
       type: s3
       config:
-        bucket: "ocp-ocpmgmt-thanos-bucket"
-        endpoint: "192.19.130.11:80"
-        insecure: true
-        access_key: "NJBPAVFV8Y31FVJ1KZRL"
-        secret_key: "udDUUjmFHa4ag03MPWdgmncwYmqYf6b1qMWIGbhJ"
+        bucket: BUCKET_NAME
+        endpoint: BUCKET_HOST
+        insecure: false
+        access_key: AWS_ACCESS_KEY_ID
+        secret_key: AWS_SECRET_ACCESS_KEY
         http_config:
           insecure_skip_verify: true
   # 
@@ -133,17 +134,20 @@ global:
       - 2w
       TEAM_RESYNC_STALE_TIME: 60m
       TESTING: false
-      SERVER_HOSTNAME: lab-registry.ocpmgmt.lab.diktio.net
+      SERVER_HOSTNAME: lab-registry.snoacm.lab.diktio.net
       DISTRIBUTED_STORAGE_CONFIG:
-        local_us:
-        - RadosGWStorage
-        - access_key: NJBPAVFV8Y31FVJ1KZRL
-          bucket_name: ocpmgmt-cluster-bucket
-          hostname: 192.19.130.13
-          is_secure: false
-          port: "80"
-          secret_key: y6jP327JGRDdqBSc7UYhsZLzhZUAuBK9BPK2Ox1j
-          storage_path: /datastorage/registry
+        default:
+          - RHOCSStorage
+          - access_key: AWS_ACCESS_KEY_ID
+            bucket_name: BUCKET_NAME
+            hostname: BUCKET_HOST
+            is_secure: true
+            port: BUCKET_PORT
+            secret_key: AWS_SECRET_ACCESS_KEY
+            storage_path: /datastorage/registry
+      DISTRIBUTED_STORAGE_DEFAULT_LOCATIONS: []
+      DISTRIBUTED_STORAGE_PREFERENCE:
+        - default
 
     ssl_cert: |-
       -----BEGIN CERTIFICATE-----
@@ -237,26 +241,6 @@ global:
         WFBk6T3neXntdKX5ZipQM6qfFbH8DoDdElCvqZkB2bc1AwWaFzYbiEjz0oeowpUw
         tEChGIzF/34=
         -----END CERTIFICATE-----
-        -----BEGIN CERTIFICATE-----                                                      
-        MIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF                 
-        ADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6                 
-        b24gUm9vdCBDQSAxMB4XDTE1MDUyNjAwMDAwMFoXDTM4MDExNzAwMDAwMFowOTEL                 
-        MAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEZMBcGA1UEAxMQQW1hem9uIFJv                 
-        b3QgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALJ4gHHKeNXj                 
-        ca9HgFB0fW7Y14h29Jlo91ghYPl0hAEvrAIthtOgQ3pOsqTQNroBvo3bSMgHFzZM                 
-        9O6II8c+6zf1tRn4SWiw3te5djgdYZ6k/oI2peVKVuRF4fn9tBb6dNqcmzU5L/qw                 
-        IFAGbHrQgLKm+a/sRxmPUDgH3KKHOVj4utWp+UhnMJbulHheb4mjUcAwhmahRWa6                 
-        VOujw5H5SNz/0egwLX0tdHA114gk957EWW67c4cX8jJGKLhD+rcdqsq08p8kDi1L                 
-        93FcXmn/6pUCyziKrlA4b9v7LWIbxcceVOF34GfID5yHI9Y/QCB/IIDEgEw+OyQm                 
-        jgSubJrIqg0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMC                 
-        AYYwHQYDVR0OBBYEFIQYzIU07LwMlJQuCFmcx7IQTgoIMA0GCSqGSIb3DQEBCwUA                 
-        A4IBAQCY8jdaQZChGsV2USggNiMOruYou6r4lK5IpDB/G/wkjUu0yKGX9rbxenDI                 
-        U5PMCCjjmCXPI6T53iHTfIUJrU6adTrCC2qJeHZERxhlbI1Bjjt/msv0tadQ1wUs                 
-        N+gDS63pYaACbvXy8MWy7Vu33PqUXHeeE6V/Uq2V8viTO96LXFvKWlJbYK8U90vv                 
-        o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU                 
-        5MsI+yMRQ+hDKXJioaldXgjUkK642M4UwtBV8ob2xJNDd2ZhwLnoQdeXeGADbkpy                 
-        rqXRfboQnoZsG4q5WTP468SQvvG5                                                     
-        -----END CERTIFICATE-----             
     #
     # Pull_Secret OCP secret name  and local registry pull_secret for target clusters.
     # Global pull secret to merge with the local_registry is dynamically taken from Hub Cluster
@@ -271,5 +255,3 @@ global:
     service_account: cli-job-sa
     service_account_name: cli-job-sa
     hook_image: registry.redhat.io/openshift4/ose-tools-rhel8:latest
-    #hook_image: registry.redhat.io/openshift4/ose-tools-rhel8@sha256:3a430c4571983d4e774a7c2a6575086ad758d6a76724cc264ba80766abf5ee6b
-    #hook_image: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ose-tools-rhel8@sha256:c2230682e3f3a492967e7b62171cf363cff24fcb8252b2a0ca50e26dbbeb1b24

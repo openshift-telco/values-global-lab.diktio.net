@@ -43,12 +43,12 @@ mgmt:
       odf: "false"
   # 
   # ACM Related
+#### nsatsia: Need to allow naming of bucket. Fixed at "local-observe-bucket" ATM
   acm:
     thanos_yaml: |-
       type: s3
       config:
         bucket: BUCKET_NAME
-        # "ocp-ocpmgmt-thanos-bucket"
         endpoint: BUCKET_HOST
         insecure: false
         access_key: AWS_ACCESS_KEY_ID
@@ -167,6 +167,7 @@ mgmt:
     #
     # Digest for AI controller image as detected at the time of mirroring
     # skopeo inspect docker://quay.io/edge-infrastructure/assisted-installer-controller:latest | egrep Digest | awk -F '"' '{print $4}'
+    # IGNORE Used for standalone (unsupported) upstream AssistedInstaller, Not needed with ACM.
     controller_image: "quay.io/edge-infrastructure/assisted-installer-controller@sha256:7de8be81d61ec1eece42cec358e9f18e25e4020be35451e6340866f487553575"
     
     #
