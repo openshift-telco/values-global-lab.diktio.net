@@ -1,0 +1,197 @@
+mgmt:
+  #
+  # name of management cluster. FQDN will be the <name.<global.domain>
+  name: snoacm
+  #  
+  # Git URL for this management cluster
+  git_url: https://github.com/nsatsia/mgmt-snoacm.lab.diktio.net.git
+  #
+  # OPTIONAL
+  # Set to override the global credentials for the given management cluster and all its target clusters
+  #
+  #git_user: ""
+  #git_token: ""
+  #
+  # This management clusters values directory path used in ArgoCD applications. Typically would not change unless
+  # you  decide to change the Git Submodule  directories
+  values_location: /values/snoacm.lab.diktio.net/values.yaml
+  #
+  # Container image mirror registry access information for OCP.
+  #
+  registry:
+    url: "lab-registry.snoacm.lab.diktio.net"
+    path: ocp41020
+    user: "nsatsia"
+    password: "Redhat01"
+  #  
+  # Defines if ODF/OCS will be using internal rook/ceph  or external
+  # Uncomment the desired setting
+  default_storage_class: "odf-lvm-vg1"
+  #default_storage_class: "odf-external-storagecluster-ceph-rbd"
+  #default_storage_class: "odf-storagecluster-ceph-rbd"
+  #
+  # For multinode Management set to 3 and SNO set to 1
+  #ingress_replica: 3
+  ingress_replica: 1
+  #
+  # Define the master nodes and storage requirements
+  # Assumed this day0 cluster is deployed by IPI baremetal or Assisted-Installer as the BMH operator is required
+  nodes:
+    masters:
+    - name: "master1.snoacm.lab.diktio.net"
+      lso: "false"
+      odf: "false"
+  # 
+  # ACM Related
+  acm:
+    thanos_yaml: |-
+      type: s3
+      config:
+        bucket: BUCKET_NAME
+        # "ocp-ocpmgmt-thanos-bucket"
+        endpoint: BUCKET_HOST
+        insecure: false
+        access_key: AWS_ACCESS_KEY_ID
+        secret_key: AWS_SECRET_ACCESS_KEY
+        http_config:
+          insecure_skip_verify: true
+  # 
+  # Quay specific configurations. Not needed if another vendor image registry is used.
+  # 
+  quay:
+  #
+  # The secret the config will be saved in
+  #
+    registry_name: lab
+    config_secret: lab-quay-config-bundle
+    #
+    # config_yaml is set to the Quay configuration customising items like a user friendly server name.
+    # This config also configures an external S3 storage to be used for image storage.
+    #
+    # ssl_cert and ssl_key are required to configure a site wide self-signed TLS certificates for the server.
+    #
+    config_yaml: |-
+      ALLOW_PULLS_WITHOUT_STRICT_LOGGING: false
+      AUTHENTICATION_TYPE: Database
+      DEFAULT_TAG_EXPIRATION: 2w
+      ENTERPRISE_LOGO_URL: /static/img/RH_Logo_Quay_Black_UX-horizontal.svg
+      FEATURE_BUILD_SUPPORT: false
+      FEATURE_DIRECT_LOGIN: true
+      FEATURE_MAILING: false
+      REGISTRY_TITLE: Red Hat Quay
+      REGISTRY_TITLE_SHORT: Red Hat Quay
+      FEATURE_PROXY_CACHE: true
+      FEATURE_PROXY_STORAGE: true
+      TAG_EXPIRATION_OPTIONS:
+      - 2w
+      TEAM_RESYNC_STALE_TIME: 60m
+      TESTING: false
+      SERVER_HOSTNAME: lab-registry.snoacm.lab.diktio.net
+      DISTRIBUTED_STORAGE_CONFIG:
+        default:
+          - RHOCSStorage
+          - access_key: AWS_ACCESS_KEY_ID
+            bucket_name: BUCKET_NAME
+            hostname: BUCKET_HOST
+            is_secure: true
+            port: BUCKET_PORT
+            secret_key: AWS_SECRET_ACCESS_KEY
+            storage_path: /datastorage/registry
+      DISTRIBUTED_STORAGE_DEFAULT_LOCATIONS: []
+      DISTRIBUTED_STORAGE_PREFERENCE:
+        - default
+
+    ssl_cert: |-
+      -----BEGIN CERTIFICATE-----
+      MIIEezCCA2OgAwIBAgICEjQwDQYJKoZIhvcNAQELBQAwOTEXMBUGA1UECgwOTEFC
+      LkRJS1RJTy5ORVQxHjAcBgNVBAMMFUNlcnRpZmljYXRlIEF1dGhvcml0eTAeFw0y
+      MjA3MTExMjQxNDdaFw0yNDA3MTExMjQxNDdaMEYxFzAVBgNVBAoMDkxBQi5ESUtU
+      SU8uTkVUMSswKQYDVQQDDCJsYWItcmVnaXN0cnkuc25vYWNtLmxhYi5kaWt0aW8u
+      bmV0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl8wte2BrqVXliIWk
+      dDG44qqqPwLZ+PgO3FtfeHa9w+VOYTVAK5Yn2PfFdyj2Y+QPqrHGKLJVtyrv3xej
+      fzOjTV69WMXnBI/VAEzuMz/AYzdH8l08lz5MYTD0aOzvFKgCtf9hfOA/OF5sVHat
+      I1+xSkA6Mltu3hRgpqFHpQrry8Iv9H8Wq9ATktf2SukzdMyBvOHQiFSlRKM8pyM3
+      H3VrzxO0iqxC/wXTOW+v0FtuTdMe2iCUoDFgbQK5ioj9DVaHd+ON166hkxD9WT3K
+      bR2UHOZkP1GWA4z/NragTdk9q/sbXdrbo8EPzsQvxPTeb/kzF/UgRIn804ziYhiJ
+      QKfGiQIDAQABo4IBfjCCAXowHwYDVR0jBBgwFoAUCtTAuX8E41C631uWeL2PNn5x
+      nDYwQAYIKwYBBQUHAQEENDAyMDAGCCsGAQUFBzABhiRodHRwOi8vaXBhLWNhLmxh
+      Yi5kaWt0aW8ubmV0L2NhL29jc3AwDgYDVR0PAQH/BAQDAgTwMB0GA1UdJQQWMBQG
+      CCsGAQUFBwMBBggrBgEFBQcDAjB5BgNVHR8EcjBwMG6gNqA0hjJodHRwOi8vaXBh
+      LWNhLmxhYi5kaWt0aW8ubmV0L2lwYS9jcmwvTWFzdGVyQ1JMLmJpbqI0pDIwMDEO
+      MAwGA1UECgwFaXBhY2ExHjAcBgNVBAMMFUNlcnRpZmljYXRlIEF1dGhvcml0eTAd
+      BgNVHQ4EFgQUWOl4LFpsiK8pW3KrLIXNYGn1WMgwTAYDVR0RBEUwQ4IibGFiLXJl
+      Z2lzdHJ5LnNub2FjbS5sYWIuZGlrdGlvLm5ldIIdbWFzdGVyMS5zbm9hY20ubGFi
+      LmRpa3Rpby5uZXQwDQYJKoZIhvcNAQELBQADggEBAI36bfB3pPxRlOs54nrwoSs2
+      jfE64bfg+34jyecpqY8siJpvttl6gf1CZCqR3fgELQ7YBEoiHhbVwKjrLeEfWBtx
+      06WPnc1WW508G1Yka7ngf1kouX4UO6+JABI77IsGMedc5n1HHAY9kE/+YvAK/tJS
+      93gp6Cd/4JflSuUl/6+VQhpIKSRipDkZQQgiosH+LS9S36lZOVRdE2vmPhVt0q4Y
+      3/GWtj6hwzXPJZ3zcrtWHACEqXMPw5EcduF8pRaGY50NpD4T6zwrLrfNU8ReFXlB
+      7Mx9wi9IggEN9z3uev1G7Y9Ai2CoFyqMN0JSSpzO/1kW3x85HAVuowgBS3zHZCY=
+      -----END CERTIFICATE-----
+
+    ssl_key: |-
+      -----BEGIN PRIVATE KEY-----
+      MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCXzC17YGupVeWI
+      haR0Mbjiqqo/Atn4+A7cW194dr3D5U5hNUArlifY98V3KPZj5A+qscYoslW3Ku/f
+      F6N/M6NNXr1YxecEj9UATO4zP8BjN0fyXTyXPkxhMPRo7O8UqAK1/2F84D84XmxU
+      dq0jX7FKQDoyW27eFGCmoUelCuvLwi/0fxar0BOS1/ZK6TN0zIG84dCIVKVEozyn
+      IzcfdWvPE7SKrEL/BdM5b6/QW25N0x7aIJSgMWBtArmKiP0NVod3443XrqGTEP1Z
+      PcptHZQc5mQ/UZYDjP82tqBN2T2r+xtd2tujwQ/OxC/E9N5v+TMX9SBEifzTjOJi
+      GIlAp8aJAgMBAAECggEACGOqZ9UuXg93PhJUwm81DqHsAst/jHj5KUiLgDbfygHU
+      UR8GSuJjlWQsL6e95ktmakKk9v7UKelflG7UBGWwMsh3on5dhC0G0ptt1rtBQLp/
+      aW+pt5oj0oNIHrxpgjS+4ZwZoTMri0v8pLZiX0AcpkPic4IGIJPzu4HSWda+rWYa
+      QcdjBEj0n0qK02RJaI0bMe26r8kFiJywaprI6CgtIt9OtsAxLxP0T8gk0vL0+fsJ
+      hWEavTx+HMKSfNx4FSXuFI5Wuu0IDTK7cDbmnrH08V5ZkYF3XCaNPgTYsz+p91p3
+      Df9YWoFSn+7huU5+8t9ocAtAU25k7bgL2xeT7ycbAQKBgQDHpa812P30qVxaqaf1
+      eQ5quLG/HczAndIqnfj/QiOkVjW0VSqc0VRj6ALYISFbVr+sUMg0+XQ0boIndyZ8
+      kVNIToryPfoFQjggcdbyAjovzmypowfxGqq6nu6/S5fNHG+NRIZzoo7+TBVSOniu
+      2WHuzYqBU67twEQOcFywHlZQsQKBgQDCpOyoujn0fLIp+4EUXWKB85Vg5NORat1v
+      8pqh9UYYrdhgL+3vK8ZmJf722PFr0DOSK9z1m8RtWsLHjJpFkKZtxoHLJhdZ3HQr
+      twiAGNwRGBo+7qBghPMh63VqizTF3oiy9fY8nkSBqQasVb4upLOWUTlCuhlfW9+v
+      9XL54KeJWQKBgBRclY4MX3pAe6bTfsnOWuYPiDFRvLw4XGL0UZzXBgOQt1F5DiuI
+      Pe8ijoe0eU5zfoD4jDK67lsamjOkN0ylFbVeLVWfdIxswISul5l/GKgfiX2Tnw+8
+      BIWcCAWClCzbJZVm07+faK4O3G3SgNR0X0SXufSOsFyXK1m9o/ZiYbNBAoGBAJ/B
+      ebSq1LKEPj8S/EjYtOdwI6TZa4SpL4KYnq5bf+L1nOilriZlyXtBqFi2isAwrING
+      mR7FcJ1IpyHdlymNpevnx9QTOYs50+elXMa2oLkvDSul8+AEfwHSHhcKlo/pLE2m
+      byolxJifQKjl3yitafDwTY0k7XpFD/19+ZZ5+0hRAoGAQ2Q6R6hzjxVsivFO5cXv
+      sLl3caK20vcHKKOV5GrZYcBhFMl4tu31EYyHkcnLbCiWUSEMQWJGrCWxzUTz90CP
+      HkIL2SbQJvQuW+TVAe7E0hssArifSmAzIqw254bVzAr7gMEeG4SGb3HlsECsihqt
+      d7bzWLEZTMU1+JbAfi8M3y4=
+      -----END PRIVATE KEY-----
+  #
+  # Define the standalone Assisted-Installer  attributes on this management cluster
+  # Assumed it was installed by the Infrastructure Operator
+  ai: 
+    namespace: assisted-installer
+    service_config_name: "assisted-service-config"
+    #
+    # Digest for AI controller image as detected at the time of mirroring
+    # skopeo inspect docker://quay.io/edge-infrastructure/assisted-installer-controller:latest | egrep Digest | awk -F '"' '{print $4}'
+    controller_image: "quay.io/edge-infrastructure/assisted-installer-controller@sha256:7de8be81d61ec1eece42cec358e9f18e25e4020be35451e6340866f487553575"
+    
+    #
+    os_images:
+      osp_version: '4.10'
+      rhcos_version: 410.84.202202251620-0 
+      root_fs_img_url: http://192.19.130.11:8989/openshift-v4/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-live-rootfs.x86_64.img
+      root_fs_iso_url: http://192.19.130.11:8989/openshift-v4/dependencies/rhcos/4.10/latest/rhcos-4.10.3-x86_64-live.x86_64.iso
+  #
+  ## to get rhcos_version boot root_fs_iso_url image and you'll see it on 1st line of console
+  ## https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.9/latest/
+  ## wget https://releases-art-rhcos.svc.ci.openshift.org/art/storage/releases/rhcos-4.8/48.84.202106301921-0/x86_64/rhcos-48.84.202106301921-0-openstack.x86_64.qcow2.gz?sha256=5a75df7b4d4dc1861093e520187a133eda3439019f280dc6e2f57edf70eb089d
+  bmh: 
+    prov_os_download_url: http://192.19.130.11:8989/rhcos-4.10.3-x86_64-openstack.x86_64.qcow2.gz?sha256=f581896eee37216021bfce9ddd5e1fd8289c366ca0d1db25221c77688de85fd7
+    #prov_os_download_url: http://192.19.130.11:8989/rhcos-48.84.202106301921-0-openstack.x86_64.qcow2.gz?sha256=5a75df7b4d4dc1861093e520187a133eda3439019f280dc6e2f57edf70eb089d
+    #prov_os_download_url: http://192.19.130.11:8989/rhcos-48.84.202106301921-0-openstack.x86_64.qcow2.gz?sha256=5a75df7b4d4dc1861093e520187a133eda3439019f280dc6e2f57edf70eb089d
+  #
+  # Some tuning for LSO volume set on this management cluster
+  lso:
+    maxdevice: 10
+    minsize: 1Gi
+#
+# Site wide Openshift GitOps configuration options
+#
+  gitops:
+    hook_image: lab-registry.snoacm.lab.diktio.net/nsatsia/openshift4/ose-tools-rhel8:latest
+    #hook_image: registry.redhat.io/openshift4/ose-tools-rhel8@sha256:3a430c4571983d4e774a7c2a6575086ad758d6a76724cc264ba80766abf5ee6b
+    #hook_image: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ose-tools-rhel8@sha256:c2230682e3f3a492967e7b62171cf363cff24fcb8252b2a0ca50e26dbbeb1b24

@@ -71,7 +71,10 @@ global:
     #
     # List of OCP version mirror URLs available to install. At least oen must be defined.
     #
+#### nsatsia - Need to try and allow management cluster override
     list:
+      - name: openshift-v4.10.12
+        path: quay.io/openshift-release-dev/ocp-release:4.10.12-x86_64
       - name: openshift-v4.10.13
         path: quay.io/openshift-release-dev/ocp-release:4.10.13-x86_64
       - name: openshift-v4.10.13-mirror
@@ -80,6 +83,12 @@ global:
         path: quay.io/openshift-release-dev/ocp-release:4.9.28-x86_64
       - name: openshift-v4.8.29-mirror
         path: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ocp4829:4.8.29-x86_64
+#
+      - name: openshift-v4.10.18-mirror
+        path: lab-registry.manage.lab.diktio.net/nsatsia/ocp41018:4.10.18-x86_64
+#        path: lab-registry.manage.lab.diktio.net/nsatsia/openshift-release-dev/ocp-release:4.10.18-x86_64
+      - name: openshift-v4.10.20-mirror
+        path: lab-registry.snoacm.lab.diktio.net/nsatsia/openshift-release-dev/ocp-release:4.10.20-x86_64
   # 
   # ACM Related
   acm:
@@ -100,6 +109,7 @@ global:
   #
   # The secret the config will be saved in
   #
+    registry_name: lab
     config_secret: lab-quay-config-bundle
     #
     # config_yaml is set to the Quay configuration customising items like a user friendly server name.
@@ -117,6 +127,8 @@ global:
       FEATURE_MAILING: false
       REGISTRY_TITLE: Red Hat Quay
       REGISTRY_TITLE_SHORT: Red Hat Quay
+      FEATURE_PROXY_CACHE: true
+      FEATURE_PROXY_STORAGE: true
       TAG_EXPIRATION_OPTIONS:
       - 2w
       TEAM_RESYNC_STALE_TIME: 60m
@@ -258,5 +270,6 @@ global:
     common_label: "telco-gitops/automation: combined-ran"
     service_account: cli-job-sa
     service_account_name: cli-job-sa
-    hook_image: registry.redhat.io/openshift4/ose-tools-rhel8@sha256:3a430c4571983d4e774a7c2a6575086ad758d6a76724cc264ba80766abf5ee6b
+    hook_image: registry.redhat.io/openshift4/ose-tools-rhel8:latest
+    #hook_image: registry.redhat.io/openshift4/ose-tools-rhel8@sha256:3a430c4571983d4e774a7c2a6575086ad758d6a76724cc264ba80766abf5ee6b
     #hook_image: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ose-tools-rhel8@sha256:c2230682e3f3a492967e7b62171cf363cff24fcb8252b2a0ca50e26dbbeb1b24
