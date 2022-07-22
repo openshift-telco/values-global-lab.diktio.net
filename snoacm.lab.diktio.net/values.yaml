@@ -43,7 +43,6 @@ mgmt:
       odf: "false"
   # 
   # ACM Related
-#### nsatsia: Need to allow naming of bucket. Fixed at "local-observe-bucket" ATM
   acm:
     thanos_yaml: |-
       type: s3

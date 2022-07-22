@@ -71,7 +71,6 @@ global:
     #
     # List of OCP version mirror URLs available to install. At least oen must be defined.
     #
-#### nsatsia - Need to try and allow management cluster override
     list:
       - name: openshift-v4.10.12
         path: quay.io/openshift-release-dev/ocp-release:4.10.12-x86_64
@@ -84,25 +83,14 @@ global:
       - name: openshift-v4.8.29-mirror
         path: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/ocp4829:4.8.29-x86_64
 #
+      - name: openshift-v4.10.20-ocpmgmt-mirror
+        path: lab-registry.ocpmgmt.lab.diktio.net/nsatsia/openshift-release-dev/ocp-release:4.10.20-x86_64
+#
       - name: openshift-v4.10.18-mirror
         path: lab-registry.manage.lab.diktio.net/nsatsia/ocp41018:4.10.18-x86_64
 #        path: lab-registry.manage.lab.diktio.net/nsatsia/openshift-release-dev/ocp-release:4.10.18-x86_64
       - name: openshift-v4.10.20-mirror
         path: lab-registry.snoacm.lab.diktio.net/nsatsia/openshift-release-dev/ocp-release:4.10.20-x86_64
-  # 
-  # ACM Related
-#### nsatsia: Need to allow naming of bucket. Fixed at "local-observe-bucket" ATM
-  acm:
-    thanos_yaml: |-
-      type: s3
-      config:
-        bucket: BUCKET_NAME
-        endpoint: BUCKET_HOST
-        insecure: false
-        access_key: AWS_ACCESS_KEY_ID
-        secret_key: AWS_SECRET_ACCESS_KEY
-        http_config:
-          insecure_skip_verify: true
   # 
   # Quay specific configurations. Not needed if another vendor image registry is used.
   # 
